@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic Story Layout</title>
+
+<style>
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+background:linear-gradient(to right,#c31432,#240b36);
+font-family:Poppins,sans-serif;
+color:#fff;
+position:relative;
+}
+
+/* soft floating glow orbs (lightweight) */
+.orb{
+position:absolute;
+width:220px;
+height:220px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(255,120,150,0.25),transparent);
+filter:blur(50px);
+animation:float 18s infinite linear;
+}
+
+@keyframes float{
+0%{transform:translateY(120vh);}
+100%{transform:translateY(-140vh);}
+}
+
+.container{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(14px);
+border-radius:20px;
+padding:50px;
+text-align:center;
+box-shadow:0 8px 40px rgba(0,0,0,0.5);
+max-width:780px;
+width:90%;
+transition:all 0.35s ease;
+animation:enter 0.5s ease;
+}
+
+@keyframes enter{
+from{opacity:0;transform:scale(0.96);}
+to{opacity:1;transform:scale(1);}
+}
+
+h1{
+margin-bottom:25px;
+font-size:28px;
+}
+
+p{
+min-height:220px;
+font-size:18px;
+line-height:1.8;
+}
+
+.cursor{
+display:inline-block;
+margin-left:4px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%,50%,100%{opacity:1;}
+25%,75%{opacity:0;}
+}
+
+.controls{
+margin-top:25px;
+}
+
+button{
+background:linear-gradient(135deg,#ff5fa2,#ff2466);
+border:none;
+border-radius:50px;
+padding:14px 34px;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
+.dots{
+margin-top:18px;
+}
+
+.dot{
+display:inline-block;
+width:8px;
+height:8px;
+border-radius:50%;
+background:#ffffff33;
+margin:4px;
+}
+
+.dot.active{
+background:#ff5fa2;
+}
+</style>
+</head>
+
+<body>
+
+<div class="orb" style="left:10%;animation-duration:22s;"></div>
+<div class="orb" style="left:70%;animation-duration:26s;"></div>
+
+<div class="container" id="container">
+<h1 id="title"></h1>
+<p><span id="text"></span><span class="cursor">|</span></p>
+
+<div class="controls">
+<button id="nextBtn" onclick="nextSlide()">Next ➜</button>
+</div>
+
+<div class="dots" id="dots"></div>
+</div>
+
+<script>
+const slides=[
+{
+title:"You Changed My Life Quietly",
+text:`i don’t think i say this enough but having you in my life has quietly changed a lot for me in the best way mai soch skta tha like js talkin to u normally makes me feel achaa and i genuinely appreciate how you listen vese toh sunti he kaha hai tu but still yk 😭 how you care vo toh krti ache se and how you show up for me baas uthti nhi hai time se 😭 i want you to know that i don’t take you or what we have for granted like ek ek word means a lot jo tu bolti aur vo tune kl dekh he liya hoga 😭 i may not always have perfect words but my intentions with you are ache nd yk that phir bhi bol rha phir se lol i promise to keep learning how to communicate better to understand your feelings more deeply and to be someone you can feel safe around emotionally and ofc love you bhot zada`
+},
+{
+title:"My Favorite Habit",
+text:`tbh the more time i spend with you the more i realise ki tu sirf meri daily routine ka part nahi hai tu meri aadat ban gayi hai bc nd one of the best addats lol the good wala comfort jisme bina reason bhi smile aa jati hai i like how we can talk about the most random bakwaas one minute and then suddenly get deep the next mostly tu deep ho jati hai nd mai sunta rehta hu 😭 but seriously being with you feels easy and real like mujhe pretend karne ki zarurat nahi padti i promise i’ll always try to understand your mood swings be patient when you’re stressed and remind you how strong you actually are jab tu khud doubt karti hai`
+},
+{
+title:"My Safe Comfort",
+text:`being with you has slowly become one of the most comforting parts of my life and i dont even think you realise how much peace your presence brings into my normal days nd how much i fkin miss u jb tu gayab ho jati 😭 i like how even silence with you does not feel awkward it just feels calm and safe like i can exist without pressure around you i promise i will always try to protect that comfort between us by being honest patient and understanding even when moods change or days feel heavy`
+},
+{
+title:"Small Future Moments",
+text:`sometimes i catch myself imagining small future moments with you like random late night calls where we both fall asleep while talking and lazy mornings where we argue over who has to get up first and silly grocery trips where we end up buying snacks instead of actual food and long walks where we talk about everything and nothing at the same time i imagine celebrating your wins like they are my own and being the first person you look for when something exciting happens`
+}
+];
+
+let index=0;
+let charIndex=0;
+let typing=false;
+
+const titleEl=document.getElementById("title");
+const textEl=document.getElementById("text");
+const btn=document.getElementById("nextBtn");
+
+function buildDots(){
+const d=document.getElementById("dots");
+slides.forEach((_,i)=>{
+const dot=document.createElement("span");
+dot.className="dot";
+d.appendChild(dot);
+});
+}
+
+function updateDots(){
+document.querySelectorAll(".dot").forEach((d,i)=>{
+d.classList.toggle("active",i===index);
+});
+}
+
+function typeText(text){
+typing=true;
+btn.disabled=true;
+charIndex=0;
+textEl.textContent="";
+const speed=0;
+let last=0;
+
+function frame(t){
+if(!last) last=t;
+if(t-last>speed){
+textEl.textContent+=text.charAt(charIndex);
+charIndex++;
+last=t;
+}
+if(charIndex<text.length){
+requestAnimationFrame(frame);
+}else{
+typing=false;
+btn.disabled=false;
+}
+}
+requestAnimationFrame(frame);
+}
+
+function loadSlide(){
+titleEl.textContent=slides[index].title;
+typeText(slides[index].text);
+updateDots();
+}
+
+function nextSlide(){
+if(typing)return;
+index=(index+1)%slides.length;
+loadSlide();
+}
+
+document.addEventListener("keydown",e=>{
+if(e.key==="ArrowRight")nextSlide();
+if(e.key==="ArrowLeft" && !typing){
+index=(index-1+slides.length)%slides.length;
+loadSlide();
+}
+});
+
+buildDots();
+loadSlide();
+</script>
+
+</body>
+</html>
